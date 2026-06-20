@@ -1,0 +1,42 @@
+@AllRestAPIs_HostAddress = http://localhost:5195
+
+
+GET {{AllRestAPIs_HostAddress}}/api/books/
+Accept: application/json
+
+###
+
+GET {{AllRestAPIs_HostAddress}}/api/books/2
+Accept: application/json
+
+###
+
+POST {{AllRestAPIs_HostAddress}}/api/books
+Content-Type: application/json
+ {
+   "id":4,
+  "Title" : "1984",
+  "Author" : "George Orwell",
+  "YearPublished" : 1949
+ }
+
+###
+
+PUT {{AllRestAPIs_HostAddress}}/api/books/2
+Content-Type: application/json
+ {
+  "Id" : 2,
+  "Title" : "1984",
+  "Author" : "Syed1",
+  "YearPublished" : 1949
+ }
+
+###
+
+DELETE {{AllRestAPIs_HostAddress}}/api/books/1
+Content-Type: application/json
+ {
+  "Id" : 1
+ }
+
+###
