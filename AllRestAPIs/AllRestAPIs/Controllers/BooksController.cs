@@ -150,7 +150,6 @@ namespace AllRestAPIs.Controllers
             {
                  return BadRequest();
             }
-            book.Id = UpdatedBook.Id;
             book.Author = UpdatedBook.Author;
             book.Title = UpdatedBook.Title;
             book.YearPublished = UpdatedBook.YearPublished;
