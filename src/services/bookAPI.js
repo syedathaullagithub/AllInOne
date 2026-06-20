@@ -41,13 +41,11 @@ export const bookAPI = {
     })
     if (!response.ok) throw new Error(`Error: ${response.status}`)
     
-    // Try to parse as JSON, but if it's just a text message, return the book with a generated ID
     const contentType = response.headers.get('content-type')
     if (contentType && contentType.includes('application/json')) {
       const data = await response.json()
       return transformFromAPI(data)
     } else {
-      // API returned text message, return the book locally
       return {
         ...book,
         id: Math.random(), // Temporary ID
@@ -67,13 +65,11 @@ export const bookAPI = {
     })
     if (!response.ok) throw new Error(`Error: ${response.status}`)
     
-    // Try to parse as JSON, but if it's just a text message, return the updated book locally
     const contentType = response.headers.get('content-type')
     if (contentType && contentType.includes('application/json')) {
       const data = await response.json()
       return transformFromAPI(data)
     } else {
-      // API returned text message, return the book with updated data
       return {
         ...book,
         id,
@@ -90,5 +86,26 @@ export const bookAPI = {
     })
     if (!response.ok) throw new Error(`Error: ${response.status}`)
     return true
+  },
+
+  // GET - Search books by query string
+  fetchSearch: async (query) => {
+    const response = await fetch(`${API_BASE}/books/search?query=${encodeURIComponent(query)}`)
+    if (!response.ok) throw new Error(`Error: ${response.status}`)
+    const data = await response.json()
+
+    return data
+  },
+
+  // POST - Advanced search (optional)
+  fetchSearchAdvanced: async (filters) => {
+    const response = await fetch(`${API_BASE}/books/search`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(filters),
+    })
+    if (!response.ok) throw new Error(`Error: ${response.status}`)
+    const data = await response.json()
+   return data
   },
 }

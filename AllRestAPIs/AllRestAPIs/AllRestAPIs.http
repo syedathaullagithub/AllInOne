@@ -40,3 +40,8 @@ Content-Type: application/json
  }
 
 ###
+
+GET {{AllRestAPIs_HostAddress}}/api/books/search?query=d
+Accept: application/json
+
+###   

@@ -7,6 +7,7 @@ import { setBooks, setError, setLoading } from '../store/bookSlice'
 import { setError as setGlobalError } from '../store/errorSlice'
 import BookForm from '../components/BookForm'
 import BookList from '../components/BookList'
+import SearchBar from '../components/SearchBar'
 
 function BooksPage() {
   const dispatch = useDispatch()
@@ -104,6 +105,7 @@ function BooksPage() {
       {!loading && (
         <>
           <BookForm book={editingBook} onCancel={handleCancelEdit} onSuccess={refreshBooks} onClose={handleClose} onOpen={handleClickOpen} open={open} />
+          <SearchBar/>
           <BookList onEdit={handleEdit} onDeleteSuccess={refreshBooks} onClose={handleClose} onOpen={handleClickOpen} onAlertClickOpen={handleAlertClickOpen} onAlertClose={handleAlertClose} openDialog={openDialog} />
         </>
       )}

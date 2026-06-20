@@ -55,6 +55,8 @@ function BookList({ onEdit, onDeleteSuccess, onOpen, onAlertClickOpen, onAlertCl
     onAlertClickOpen();
   }
 
+  console.log('Rendering BookList with books:', books);
+
   return (
   <>
  <AlertDialog open={openDialog} onClose={onAlertClose} title="Confirm Delete" description="Are you sure you want to delete this book?" onDelete={() => handleDelete(selectedBookId)} />

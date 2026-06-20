@@ -109,7 +109,7 @@ function BookForm({ book = null, onCancel, onSuccess, onClose, onOpen, open }) {
         >
           <form onSubmit={handleSubmit(onSubmit)}>
             <DialogTitle sx={{ m: 0, p: 2 ,color: 'primary.main' }} id="customized-dialog-title">
-              {book ? 'Edit Book' : 'Add New Book'}
+              {book ? 'Edit Book' : open ? 'Add New Book' : ''}
             </DialogTitle>
             <IconButton
               aria-label="close"

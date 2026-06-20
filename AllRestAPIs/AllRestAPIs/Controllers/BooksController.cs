@@ -171,5 +171,46 @@ namespace AllRestAPIs.Controllers
             await _context.SaveChangesAsync();
             return Ok($"Book {book.Title} is deleted");
         }
+
+        // GET: api/books/search?query=harry
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchBooks([FromQuery] string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+                return BadRequest("Search query cannot be empty.");
+
+            var results = await _context.Books.Where(b => b.Title.Contains(query)|| b.Author.Contains(query)).ToListAsync();
+
+            return Ok(results);
+        }
+
+        //Pagination
+        [HttpGet("paged")]
+        public async Task<IActionResult> GetBooksPaged(int pageNumber = 1, int pageSize = 10)
+        {
+            if (pageNumber <= 0 || pageSize <= 0)
+                return BadRequest("Page number and size must be greater than zero.");
+
+            var totalItems = await _context.Books.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            var items = await _context.Books
+                .OrderBy(b => b.Id) // optional: ensure consistent ordering
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var response = new
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalItems = totalItems,
+                TotalPages = totalPages,
+                Items = items
+            };
+
+            return Ok(response);
+        }
+
     }
 }
