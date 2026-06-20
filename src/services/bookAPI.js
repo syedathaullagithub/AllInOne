@@ -18,6 +18,7 @@ const transformFromAPI = (book) => ({
 export const bookAPI = {
   // GET all books
   getBooks: async () => {
+    debugger
     const response = await fetch(`${API_BASE}/books/`)
     if (!response.ok) throw new Error(`Error: ${response.status}`)
     const data = await response.json()

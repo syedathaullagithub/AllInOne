@@ -2,6 +2,7 @@ import DashboardPage from '../pages/DashboardPage'
 import BooksPage from '../pages/BooksPage'
 import AuthorsPage from '../pages/AuthorsPage'
 import SettingsPage from '../pages/SettingsPage'
+import ErrorPage from '../pages/ErrorPage'
 
 export const routes = [
   {
@@ -23,5 +24,10 @@ export const routes = [
     path: '/settings',
     element: <SettingsPage />,
     label: 'Settings',
+  },
+  {
+    path: '/error',
+    element: <ErrorPage />,
+    label: 'Error',
   },
 ]

@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { Box, Typography, CircularProgress, Alert } from '@mui/material'
 import { useApi } from '../hooks/useApi'
 import { setBooks, setError, setLoading } from '../store/bookSlice'
+import { setError as setGlobalError } from '../store/errorSlice'
 import BookForm from '../components/BookForm'
 import BookList from '../components/BookList'
 
 function BooksPage() {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const { data: books, loading, error } = useApi('/api/books')
   const [editingBook, setEditingBook] = useState(null)
 
@@ -20,8 +23,13 @@ function BooksPage() {
   useEffect(() => {
     if (error) {
       dispatch(setError(error.message))
+      dispatch(setGlobalError({
+        message: error.message,
+        statusCode: error.status || 500
+      }))
+      navigate('/error')
     }
-  }, [error, dispatch])
+  }, [error, dispatch, navigate])
 
   useEffect(() => {
     dispatch(setLoading(loading))

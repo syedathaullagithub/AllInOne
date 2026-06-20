@@ -12,7 +12,9 @@ import {
   Alert,
 } from '@mui/material';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { addBook, updateBook } from '../store/bookSlice';
+import { setError as setGlobalError } from '../store/errorSlice';
 import { bookAPI } from '../services/bookAPI';
 import { useState, useEffect } from 'react';
 
@@ -28,6 +30,7 @@ const validationSchema = yup.object().shape({
 
 function BookForm({ book = null, onCancel }) {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
@@ -85,8 +88,18 @@ function BookForm({ book = null, onCancel }) {
         onCancel?.();
       }, 2000);
     } catch (err) {
-      setError(err.message || 'Error saving book');
+      const errorMessage = err.message || 'Error saving book';
+      setError(errorMessage);
       console.error('Error saving book:', err);
+      
+      // Check if it's a server error (5xx)
+      if (errorMessage.includes('500') || errorMessage.includes('502') || errorMessage.includes('503') || errorMessage.includes('504')) {
+        dispatch(setGlobalError({
+          message: `Server error while saving book: ${errorMessage}`,
+          statusCode: parseInt(errorMessage.match(/\d+/)?.[0]) || 500
+        }));
+        navigate('/error');
+      }
     } finally {
       setLoading(false);
     }
