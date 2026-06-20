@@ -11,7 +11,7 @@ import BookList from '../components/BookList'
 function BooksPage() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { data: books, loading, error } = useApi('/api/books')
+  const { data: books, loading, error, refetch } = useApi('/api/books')
   const [editingBook, setEditingBook] = useState(null)
 
   useEffect(() => {
@@ -19,6 +19,11 @@ function BooksPage() {
       dispatch(setBooks(books))
     }
   }, [books, dispatch])
+
+  // Refresh books after add/update/delete
+  const refreshBooks = async () => {
+    await refetch()
+  }
 
   useEffect(() => {
     if (error) {
@@ -61,8 +66,8 @@ function BooksPage() {
       )}
       {!loading && (
         <>
-          <BookForm book={editingBook} onCancel={handleCancelEdit} />
-          <BookList onEdit={handleEdit} />
+          <BookForm book={editingBook} onCancel={handleCancelEdit} onSuccess={refreshBooks} />
+          <BookList onEdit={handleEdit} onDeleteSuccess={refreshBooks} />
         </>
       )}
     </Box>

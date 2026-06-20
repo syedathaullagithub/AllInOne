@@ -12,7 +12,6 @@ import {
 } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { addBook, updateBook } from '../store/bookSlice';
 import { setError as setGlobalError } from '../store/errorSlice';
 import { bookAPI } from '../services/bookAPI';
 import { useState, useEffect } from 'react';
@@ -27,7 +26,7 @@ const validationSchema = yup.object().shape({
     .max(new Date().getFullYear(), 'Year cannot be in the future'),
 });
 
-function BookForm({ book = null, onCancel }) {
+function BookForm({ book = null, onCancel, onSuccess }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -72,12 +71,10 @@ function BookForm({ book = null, onCancel }) {
       
       if (book) {
         // Update existing book
-        const updated = await bookAPI.updateBook(book.id, data);
-        dispatch(updateBook(updated));
+        await bookAPI.updateBook(book.id, data);
       } else {
         // Add new book
-        const newBook = await bookAPI.createBook(data);
-        dispatch(addBook(newBook));
+        await bookAPI.createBook(data);
       }
       
       setSuccess(true);
@@ -85,6 +82,8 @@ function BookForm({ book = null, onCancel }) {
       setTimeout(() => {
         setSuccess(false);
         onCancel?.();
+        // Refetch books after successful add/update
+        onSuccess?.();
       }, 2000);
     } catch (err) {
       const errorMessage = err.message || 'Error saving book';

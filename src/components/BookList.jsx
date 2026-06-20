@@ -46,6 +46,8 @@ function BookList({ onEdit }) {
     );
   }
 
+  console.log('Rendering BookList with books:', books);
+
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }}>

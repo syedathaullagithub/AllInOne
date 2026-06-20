@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { bookAPI } from '../services/bookAPI';
 
 export const useApi = (url) => {
@@ -8,43 +8,44 @@ export const useApi = (url) => {
     error: null,
   });
 
+  const fetchData = useCallback(async () => {
+    try {
+      let data;
+      if (url === '/api/books') {
+        data = await bookAPI.getBooks();
+      } else {
+        throw new Error('Unsupported API endpoint');
+      }
+
+      setState({
+        data,
+        loading: false,
+        error: null,
+      });
+    } catch (error) {
+      setState({
+        data: null,
+        loading: false,
+        error: error instanceof Error ? error : new Error('Unknown error'),
+      });
+      console.error('API call failed:', error);
+    }
+  }, [url]);
+
   useEffect(() => {
     let isMounted = true;
 
-    const fetchData = async () => {
-      try {
-        let data;
-        if (url === '/api/books') {
-          data = await bookAPI.getBooks();
-        } else {
-          throw new Error('Unsupported API endpoint');
-        }
-
-        if (isMounted) {
-          setState({
-            data,
-            loading: false,
-            error: null,
-          });
-        }
-      } catch (error) {
-        if (isMounted) {
-          setState({
-            data: null,
-            loading: false,
-            error: error instanceof Error ? error : new Error('Unknown error'),
-          });
-          console.error('API call failed:', error);
-        }
-      }
-    };
-
-    fetchData();
+    if (isMounted) {
+      fetchData();
+    }
 
     return () => {
       isMounted = false;
     };
-  }, [url]);
+  }, [fetchData]);
 
-  return state;
+  return {
+    ...state,
+    refetch: fetchData, // ← New function to manually refetch
+  };
 };

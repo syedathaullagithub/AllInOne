@@ -14,12 +14,17 @@ public class Program
         builder.Services.AddDbContext<ApiContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-        // CORS: allow the frontend at http://localhost:5174 (include https variant)
+        // CORS: allow the frontend at localhost dev server and GitHub Pages
         builder.Services.AddCors(options =>
         {
             options.AddPolicy("AllowLocal5174", policy =>
             {
-                policy.WithOrigins("http://localhost:5174", "https://localhost:5174")
+                policy.WithOrigins(
+                    "http://localhost:5173",
+                    "https://localhost:5173",
+                    "http://localhost:5174", 
+                    "https://localhost:5174",
+                    "https://syedathaullagithub.github.io")
                       .AllowAnyHeader()
                       .AllowAnyMethod();
                 // .AllowCredentials(); // uncomment if you need cookies/credentials

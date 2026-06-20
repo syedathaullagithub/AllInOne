@@ -1,4 +1,4 @@
-const API_BASE = '/api'
+const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
 // Transform data from UI (lowercase) to API (uppercase)
 const transformToAPI = (book) => ({
