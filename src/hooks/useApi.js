@@ -9,6 +9,7 @@ export const useApi = (url) => {
   });
 
   const fetchData = useCallback(async () => {
+    setState((prev) => ({ ...prev, loading: true }));
     try {
       let data;
       if (url === '/api/books') {
@@ -16,12 +17,7 @@ export const useApi = (url) => {
       } else {
         throw new Error('Unsupported API endpoint');
       }
-
-      setState({
-        data,
-        loading: false,
-        error: null,
-      });
+      setState({ data, loading: false, error: null });
     } catch (error) {
       setState({
         data: null,
@@ -33,19 +29,11 @@ export const useApi = (url) => {
   }, [url]);
 
   useEffect(() => {
-    let isMounted = true;
-
-    if (isMounted) {
-      fetchData();
-    }
-
-    return () => {
-      isMounted = false;
-    };
+    fetchData();
   }, [fetchData]);
 
   return {
     ...state,
-    refetch: fetchData, // ← New function to manually refetch
+    refetch: fetchData,
   };
 };

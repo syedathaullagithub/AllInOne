@@ -50,10 +50,8 @@ function Sidebar() {
   return (
     <Drawer
       sx={{
-        width: DRAWER_WIDTH,
         flexShrink: 0,
         '& .MuiDrawer-paper': {
-          width: DRAWER_WIDTH,
           boxSizing: 'border-box',
           backgroundColor: '#1e1e2e',
           color: '#fff',

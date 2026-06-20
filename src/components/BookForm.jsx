@@ -5,16 +5,19 @@ import {
   TextField,
   Button,
   Box,
-  Card,
-  CardContent,
-  Typography,
-  Alert,
 } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { setError as setGlobalError } from '../store/errorSlice';
 import { bookAPI } from '../services/bookAPI';
 import { useState, useEffect } from 'react';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+
 
 const validationSchema = yup.object().shape({
   title: yup.string().required('Title is required').min(1),
@@ -26,13 +29,11 @@ const validationSchema = yup.object().shape({
     .max(new Date().getFullYear(), 'Year cannot be in the future'),
 });
 
-function BookForm({ book = null, onCancel, onSuccess }) {
+function BookForm({ book = null, onCancel, onSuccess, onClose, onOpen, open }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
-  
+
   const {
     control,
     handleSubmit,
@@ -67,8 +68,7 @@ function BookForm({ book = null, onCancel, onSuccess }) {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-      setError(null);
-      
+
       if (book) {
         // Update existing book
         await bookAPI.updateBook(book.id, data);
@@ -76,20 +76,18 @@ function BookForm({ book = null, onCancel, onSuccess }) {
         // Add new book
         await bookAPI.createBook(data);
       }
-      
-      setSuccess(true);
       reset();
       setTimeout(() => {
-        setSuccess(false);
         onCancel?.();
         // Refetch books after successful add/update
         onSuccess?.();
-      }, 2000);
+                onClose?.();
+                reset();
+      }, 1);
     } catch (err) {
       const errorMessage = err.message || 'Error saving book';
-      setError(errorMessage);
       console.error('Error saving book:', err);
-      
+
       // Check if it's a server error (5xx)
       if (errorMessage.includes('500') || errorMessage.includes('502') || errorMessage.includes('503') || errorMessage.includes('504')) {
         dispatch(setGlobalError({
@@ -104,81 +102,80 @@ function BookForm({ book = null, onCancel, onSuccess }) {
   };
 
   return (
-    <Card sx={{ mb: 3, p: 2 }}>
-      <CardContent>
-        <Typography variant="h6" sx={{ mb: 2 }}>
-          {book ? 'Edit Book' : 'Add New Book'}
-        </Typography>
-        
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-        
-        {success && (
-          <Alert severity="success" sx={{ mb: 2 }}>
-            Book saved successfully!
-          </Alert>
-        )}
-        
-        <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <Controller
-            name="title"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Title"
-                error={!!errors.title}
-                helperText={errors.title?.message}
-                fullWidth
-              />
-            )}
-          />
-
-          <Controller
-            name="author"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Author"
-                error={!!errors.author}
-                helperText={errors.author?.message}
-                fullWidth
-              />
-            )}
-          />
-
-          <Controller
-            name="yearPublished"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Year Published"
-                type="number"
-                error={!!errors.yearPublished}
-                helperText={errors.yearPublished?.message}
-                fullWidth
-              />
-            )}
-          />
-
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button type="submit" variant="contained" color="primary" disabled={loading}>
-              {loading ? 'Saving...' : book ? 'Update Book' : 'Add Book'}
-            </Button>
-            {book && (
-              <Button variant="outlined" onClick={onCancel} disabled={loading}>
-                Cancel
-              </Button>
-            )}
-          </Box>
-        </Box>
-      </CardContent>
-    </Card>
+        <Dialog
+          onClose={onClose}
+          aria-labelledby="customized-dialog-title"
+          open={open}
+        >
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <DialogTitle sx={{ m: 0, p: 2 ,color: 'primary.main' }} id="customized-dialog-title">
+              {book ? 'Edit Book' : 'Add New Book'}
+            </DialogTitle>
+            <IconButton
+              aria-label="close"
+              onClick={onClose}
+              sx={(theme) => ({
+                position: 'absolute',
+                right: 8,
+                top: 8,
+                color: theme.palette.grey[500],
+              })}
+            >
+              <CloseIcon />
+            </IconButton>
+            <DialogContent dividers>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Controller
+                  name="title"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Title"
+                      error={!!errors.title}
+                      helperText={errors.title?.message}
+                      fullWidth
+                    />
+                  )}
+                />
+                <Controller
+                  name="author"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Author"
+                      error={!!errors.author}
+                      helperText={errors.author?.message}
+                      fullWidth
+                    />
+                  )}
+                />
+                <Controller
+                  name="yearPublished"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Year Published"
+                      type="number"
+                      error={!!errors.yearPublished}
+                      helperText={errors.yearPublished?.message}
+                      fullWidth
+                    />
+                  )}
+                />
+              </Box>
+            </DialogContent>
+            <DialogActions>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button type="submit" variant="contained" color="primary" disabled={loading}>
+                  {loading ? 'Saving...' : book ? 'Update Book' : 'Add Book'}
+                </Button>
+              </Box>
+            </DialogActions>
+          </form>
+        </Dialog>
   );
 }
 

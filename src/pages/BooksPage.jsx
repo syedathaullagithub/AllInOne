@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { Box, Typography, CircularProgress, Alert } from '@mui/material'
+import { Box, Typography, CircularProgress, Alert, Button } from '@mui/material'
 import { useApi } from '../hooks/useApi'
 import { setBooks, setError, setLoading } from '../store/bookSlice'
 import { setError as setGlobalError } from '../store/errorSlice'
@@ -13,6 +13,9 @@ function BooksPage() {
   const navigate = useNavigate()
   const { data: books, loading, error, refetch } = useApi('/api/books')
   const [editingBook, setEditingBook] = useState(null)
+  const [open, setOpen] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+
 
   useEffect(() => {
     if (books) {
@@ -49,6 +52,22 @@ function BooksPage() {
     setEditingBook(null)
   }
 
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setEditingBook(null);
+    setOpen(false);
+  };
+
+  const handleAlertClickOpen = () => {
+    setOpenDialog(true);
+  };
+
+  const handleAlertClose = () => {
+    setOpenDialog(false);
+  };
+
   return (
     <Box>
       <Typography variant="h3" sx={{ mb: 4, fontWeight: 'bold' }}>
@@ -64,10 +83,28 @@ function BooksPage() {
           <CircularProgress />
         </Box>
       )}
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
+
+      {/* {success && (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            Book saved successfully!
+          </Alert>
+        )} */}
+
+      {!open && (
+        <Button variant="contained" color="primary" disabled={loading} onClick={handleClickOpen}>
+          Add Book
+        </Button>
+      )}
       {!loading && (
         <>
-          <BookForm book={editingBook} onCancel={handleCancelEdit} onSuccess={refreshBooks} />
-          <BookList onEdit={handleEdit} onDeleteSuccess={refreshBooks} />
+          <BookForm book={editingBook} onCancel={handleCancelEdit} onSuccess={refreshBooks} onClose={handleClose} onOpen={handleClickOpen} open={open} />
+          <BookList onEdit={handleEdit} onDeleteSuccess={refreshBooks} onClose={handleClose} onOpen={handleClickOpen} onAlertClickOpen={handleAlertClickOpen} onAlertClose={handleAlertClose} openDialog={openDialog} />
         </>
       )}
     </Box>

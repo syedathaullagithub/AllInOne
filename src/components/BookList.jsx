@@ -1,4 +1,4 @@
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import {
   Table,
   TableBody,
@@ -12,30 +12,29 @@ import {
   Typography,
   CircularProgress,
 } from '@mui/material';
-import { deleteBook } from '../store/bookSlice';
 import { bookAPI } from '../services/bookAPI';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { useState } from 'react';
+import AlertDialog from './AlertDialog';
 
-function BookList({ onEdit }) {
+function BookList({ onEdit, onDeleteSuccess, onOpen, onAlertClickOpen, onAlertClose, openDialog }) {
   const books = useSelector(state => state.books.books);
-  const dispatch = useDispatch();
   const [deleting, setDeleting] = useState(null);
+  const [selectedBookId, setSelectedBookId] = useState(null);
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this book?')) {
       try {
         setDeleting(id);
         await bookAPI.deleteBook(id);
-        dispatch(deleteBook(id));
+        onDeleteSuccess(id);
       } catch (error) {
         console.error('Error deleting book:', error);
         alert('Error deleting book: ' + error.message);
       } finally {
         setDeleting(null);
+        onAlertClose();
       }
-    }
   };
 
   if (books.length === 0) {
@@ -46,14 +45,24 @@ function BookList({ onEdit }) {
     );
   }
 
-  console.log('Rendering BookList with books:', books);
+  const handleEditClick = (book) => {
+    onOpen();
+    onEdit(book);
+  };
+
+  const handleDeleteClick = (id) => {
+    setSelectedBookId(id);
+    onAlertClickOpen();
+  }
 
   return (
+  <>
+ <AlertDialog open={openDialog} onClose={onAlertClose} title="Confirm Delete" description="Are you sure you want to delete this book?" onDelete={() => handleDelete(selectedBookId)} />
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }}>
         <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
           <TableRow>
-            <TableCell sx={{ fontWeight: 'bold' }}>ID</TableCell>
+            {/* <TableCell sx={{ fontWeight: 'bold' }}>ID</TableCell> */}
             <TableCell sx={{ fontWeight: 'bold' }}>Title</TableCell>
             <TableCell sx={{ fontWeight: 'bold' }}>Author</TableCell>
             <TableCell sx={{ fontWeight: 'bold' }} align="right">
@@ -67,7 +76,7 @@ function BookList({ onEdit }) {
         <TableBody>
           {books.map(book => (
             <TableRow key={book.id} hover>
-              <TableCell>{book.id}</TableCell>
+              {/* <TableCell>{book.id}</TableCell> */}
               <TableCell>{book.title}</TableCell>
               <TableCell>{book.author}</TableCell>
               <TableCell align="right">{book.yearPublished}</TableCell>
@@ -77,7 +86,7 @@ function BookList({ onEdit }) {
                     size="small"
                     variant="outlined"
                     startIcon={<EditIcon />}
-                    onClick={() => onEdit(book)}
+                    onClick={() => handleEditClick(book)}
                     disabled={deleting === book.id}
                   >
                     Edit
@@ -87,10 +96,10 @@ function BookList({ onEdit }) {
                     variant="outlined"
                     color="error"
                     startIcon={deleting === book.id ? <CircularProgress size={16} /> : <DeleteIcon />}
-                    onClick={() => handleDelete(book.id)}
+                    onClick={() => handleDeleteClick(book.id)}
                     disabled={deleting === book.id}
                   >
-                    Delete
+                    Delete  
                   </Button>
                 </Box>
               </TableCell>
@@ -99,6 +108,7 @@ function BookList({ onEdit }) {
         </TableBody>
       </Table>
     </TableContainer>
+  </>
   );
 }
 
