@@ -6,19 +6,6 @@ function SettingsPage() {
   const [notifications, setNotifications] = useState(true)
   const [autoSave, setAutoSave] = useState(true)
 
-  const handleSave = () => {
-    // Save settings to localStorage or API
-    localStorage.setItem(
-      'appSettings',
-      JSON.stringify({
-        darkMode,
-        notifications,
-        autoSave,
-      })
-    )
-    alert('Settings saved successfully!')
-  }
-
   return (
     <Box>
       <Typography variant="h3" sx={{ mb: 4, fontWeight: 'bold' }}>

@@ -4,30 +4,30 @@ import BookIcon from '@mui/icons-material/Book'
 import PersonIcon from '@mui/icons-material/Person'
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
 
+const StatCard = ({ icon: Icon, title, value, color }) => (
+  <Card sx={{ backgroundColor: color, color: 'white' }}>
+    <CardContent>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Icon sx={{ fontSize: 40 }} />
+        <Box>
+          <Typography variant="body2" sx={{ opacity: 0.8 }}>
+            {title}
+          </Typography>
+          <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+            {value}
+          </Typography>
+        </Box>
+      </Box>
+    </CardContent>
+  </Card>
+)
+
 function DashboardPage() {
   const books = useSelector(state => state.books.books)
 
   const latestBooks = books.slice(-3).reverse()
   const totalAuthors = new Set(books.map(b => b.author)).size
   const averageYear = Math.round(books.reduce((sum, b) => sum + b.yearPublished, 0) / books.length) || 0
-
-  const StatCard = ({ icon: Icon, title, value, color }) => (
-    <Card sx={{ backgroundColor: color, color: 'white' }}>
-      <CardContent>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Icon sx={{ fontSize: 40 }} />
-          <Box>
-            <Typography variant="body2" sx={{ opacity: 0.8 }}>
-              {title}
-            </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-              {value}
-            </Typography>
-          </Box>
-        </Box>
-      </CardContent>
-    </Card>
-  )
 
   return (
     <Box>

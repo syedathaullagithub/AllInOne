@@ -1,5 +1,5 @@
 import { Box, Container } from '@mui/material'
-import Sidebar, { DRAWER_WIDTH } from './Sidebar'
+import Sidebar from './Sidebar'
 
 function Layout({ children }) {
   return (
